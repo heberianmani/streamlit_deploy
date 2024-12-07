@@ -1,60 +1,43 @@
-# create a new folder
-# copy the pickle file and train-dataset-file to that new folder
-
-# web app development using streamlit
-# load the necessary libraries
-
-# try to install by below command
-# !pip install streamlit
-
 import streamlit as st
 import pandas as pd
-import joblib
+import requests
+import json
 
-st.title("Promotion Prediction App")
+st.title("Cross Sell Insurance Prediction")
+st.title("Provide the input and predict")
 
-# read the dataset to fill the values in input options of each element
-df = pd.read_csv('hack_train.csv')
+df = pd.read_csv("hack_test.csv")
 
-# create the input elements
-# categorical columns
-department = st.selectbox("Department", pd.unique(df['department']))
-region = st.selectbox("Region", pd.unique(df['region']))
-education = st.selectbox("Education", pd.unique(df['education']))
-gender = st.selectbox("Gender", pd.unique(df['gender']))
-recruitment_channel = st.selectbox("Recruitment_channel", pd.unique(df['recruitment_channel']))
+Gender = st.selectbox("Gender", pd.unique(df['Gender']))
+Age = st.number_input("Age", step=1)
+Driving_License = st.number_input("Driving_License", step=1)
+Region_Code = st.number_input("Region_Code", step=1)
+Previously_Insured = st.number_input("Previously_Insured", step=1)
+Vehicle_Age = st.selectbox("Vehicle_Age", pd.unique(df['Vehicle_Age']))
+Vehicle_Damage = st.selectbox("Vehicle_Damage", pd.unique(df['Vehicle_Damage']))
+Annual_Premium = st.number_input("Annual_Premium", step=1)
+Policy_Sales_Channel = st.number_input("Policy_Sales_Channel", step=1)
+Vintage = st.number_input("Vintage", step=1)
 
-# non-categorical columns
-no_of_trainings = st.number_input("No_of_trainings")
-age = st.number_input("Age")
-previous_year_rating = st.number_input("Previous_year_rating")
-length_of_service = st.number_input("Length_of_service")
-KPIs_met_80 = st.number_input("KPIs_met >80%")
-awards_won = st.number_input("Enter Awards_won") 
-avg_training_score = st.number_input("Avg_training_score")
 
-# map the user inputs to respective column format
 inputs = {
-"department" : department,
-"region" : region,
-"education" : education,
-"gender" : gender,
-"recruitment_channel" :  recruitment_channel,
-"no_of_trainings" : no_of_trainings,
-"age" : age,
-"previous_year_rating" : previous_year_rating,
-"length_of_service" : length_of_service,
-"KPIs_met >80%" :  KPIs_met_80,
-"awards_won?" : awards_won,
-"avg_training_score" : avg_training_score
+    "Gender"              :   Gender,
+    "Age"                 :   Age,     
+    "Driving_License"     :   Driving_License,
+    "Region_Code"         :   Region_Code,
+    "Previously_Insured"  :   Previously_Insured,
+    "Vehicle_Age"         :   Vehicle_Age,
+    "Vehicle_Damage"      :   Vehicle_Damage,
+    "Annual_Premium"      :   Annual_Premium,
+    "Policy_Sales_Channel":   Policy_Sales_Channel,
+    "Vintage"             :   Vintage
 }
 
-# load the model from the pickle file
-model = joblib.load('promote_pipeline_model.pkl')
-
-# action for submit button
 if st.button('Predict'):
-    X_input = pd.DataFrame(inputs, index=[0])
-    prediction = model.predict(X_input)
-    st.write("The Predicted value is : ")
-    st.write(prediction)
+    #res = requests.post(url = "http://127.0.0.1:8000/predict", data = json.dumps(inputs))
+    res = requests.post(url = "https://api-cross-sell-1094332162336.us-central1.run.app/predict", data = json.dumps(inputs))
+
+    st.json(res.text)
+
+
+# command to run in terminal: streamlit run webview.py    
